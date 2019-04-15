@@ -30,7 +30,7 @@ ignored = [
 
 [[constraint]]
   name = "github.com/terraform-providers/terraform-provider-openstack"
-  version = "=1.12.0"
+  version = "=1.17.0"
 
 [[override]]
   name = "github.com/coreos/ignition"
@@ -38,4 +38,4 @@ ignored = [
 
 [[override]]
   name = "github.com/gophercloud/gophercloud"
-  revision = "0719c6b22f30132b0ae6c90b038e0d50992107b0"
+  revision = "33e54f40ffcfee569ae243b8d1d137d5363b4a28"

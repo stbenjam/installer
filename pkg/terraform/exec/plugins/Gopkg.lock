@@ -249,7 +249,7 @@
   revision = "24818f796faf91cd76ec7bddd72458fbced7a6c1"
 
 [[projects]]
-  digest = "1:54d36727a1d852a38be8b8dbcfbae6aa99130d793d63dabc865f150b690144af"
+  digest = "1:ed9e34199e443eb1f0fb2776eefb054a2c2f8165fd1ebe6f75b646aefa193cb7"
   name = "github.com/gophercloud/gophercloud"
   packages = [
     ".",
@@ -257,7 +257,9 @@
     "openstack",
     "openstack/blockstorage/extensions/volumeactions",
     "openstack/blockstorage/v1/volumes",
+    "openstack/blockstorage/v2/snapshots",
     "openstack/blockstorage/v2/volumes",
+    "openstack/blockstorage/v3/snapshots",
     "openstack/blockstorage/v3/volumes",
     "openstack/compute/v2/extensions/attachinterfaces",
     "openstack/compute/v2/extensions/availabilityzones",
@@ -284,6 +286,7 @@
     "openstack/dns/v2/zones",
     "openstack/identity/v2/tenants",
     "openstack/identity/v2/tokens",
+    "openstack/identity/v3/applicationcredentials",
     "openstack/identity/v3/endpoints",
     "openstack/identity/v3/groups",
     "openstack/identity/v3/projects",
@@ -294,27 +297,34 @@
     "openstack/imageservice/v2/imagedata",
     "openstack/imageservice/v2/images",
     "openstack/networking/v2/extensions/attributestags",
+    "openstack/networking/v2/extensions/dns",
     "openstack/networking/v2/extensions/external",
     "openstack/networking/v2/extensions/extradhcpopts",
     "openstack/networking/v2/extensions/fwaas/firewalls",
     "openstack/networking/v2/extensions/fwaas/policies",
     "openstack/networking/v2/extensions/fwaas/routerinsertion",
     "openstack/networking/v2/extensions/fwaas/rules",
+    "openstack/networking/v2/extensions/layer3/addressscopes",
     "openstack/networking/v2/extensions/layer3/floatingips",
     "openstack/networking/v2/extensions/layer3/routers",
     "openstack/networking/v2/extensions/lbaas/members",
     "openstack/networking/v2/extensions/lbaas/monitors",
     "openstack/networking/v2/extensions/lbaas/pools",
     "openstack/networking/v2/extensions/lbaas/vips",
+    "openstack/networking/v2/extensions/lbaas_v2/l7policies",
     "openstack/networking/v2/extensions/lbaas_v2/listeners",
     "openstack/networking/v2/extensions/lbaas_v2/loadbalancers",
     "openstack/networking/v2/extensions/lbaas_v2/monitors",
     "openstack/networking/v2/extensions/lbaas_v2/pools",
+    "openstack/networking/v2/extensions/mtu",
+    "openstack/networking/v2/extensions/portsbinding",
+    "openstack/networking/v2/extensions/portsecurity",
     "openstack/networking/v2/extensions/provider",
     "openstack/networking/v2/extensions/security/groups",
     "openstack/networking/v2/extensions/security/rules",
     "openstack/networking/v2/extensions/subnetpools",
     "openstack/networking/v2/extensions/trunks",
+    "openstack/networking/v2/extensions/vlantransparent",
     "openstack/networking/v2/extensions/vpnaas/endpointgroups",
     "openstack/networking/v2/extensions/vpnaas/ikepolicies",
     "openstack/networking/v2/extensions/vpnaas/ipsecpolicies",
@@ -327,11 +337,19 @@
     "openstack/objectstorage/v1/containers",
     "openstack/objectstorage/v1/objects",
     "openstack/objectstorage/v1/swauth",
+    "openstack/sharedfilesystems/apiversions",
+    "openstack/sharedfilesystems/v2/availabilityzones",
+    "openstack/sharedfilesystems/v2/errors",
+    "openstack/sharedfilesystems/v2/messages",
+    "openstack/sharedfilesystems/v2/securityservices",
+    "openstack/sharedfilesystems/v2/sharenetworks",
+    "openstack/sharedfilesystems/v2/shares",
+    "openstack/sharedfilesystems/v2/snapshots",
     "openstack/utils",
     "pagination",
   ]
   pruneopts = "NUT"
-  revision = "0719c6b22f30132b0ae6c90b038e0d50992107b0"
+  revision = "33e54f40ffcfee569ae243b8d1d137d5363b4a28"
 
 [[projects]]
   branch = "master"
@@ -480,12 +498,12 @@
   version = "v1.0.1"
 
 [[projects]]
-  digest = "1:08d640f9d1ab3f57c30971280a3d02f868447a152e99c477d520d0e0c90e66f2"
+  digest = "1:377d09f6eefcfe386649401e0c31a0d53204ad67ae68e26580da1f0a78af55aa"
   name = "github.com/terraform-providers/terraform-provider-openstack"
   packages = ["openstack"]
   pruneopts = "NUT"
-  revision = "508765e66992e6c813f4ca7762d6e94c32379754"
-  version = "v1.12.0"
+  revision = "e320e1e00281be4ef2553cafc5165debe1e8fb21"
+  version = "v1.17.0"
 
 [[projects]]
   branch = "master"
