@@ -7,10 +7,10 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
 
-	configv1 "github.com/openshift/api/config/v1"
 	"github.com/openshift/installer/pkg/asset"
 	"github.com/openshift/installer/pkg/asset/installconfig"
 	"github.com/openshift/installer/pkg/asset/templates/content/openshift"
+	configv1 "github.com/openshift/api/config/v1"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

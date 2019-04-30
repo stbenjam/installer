@@ -25,6 +25,7 @@ import (
 	"github.com/openshift/installer/pkg/asset/installconfig"
 	"github.com/openshift/installer/pkg/asset/machines/aws"
 	"github.com/openshift/installer/pkg/asset/machines/azure"
+	"github.com/openshift/installer/pkg/asset/machines/baremetal"
 	"github.com/openshift/installer/pkg/asset/machines/libvirt"
 	"github.com/openshift/installer/pkg/asset/machines/machineconfig"
 	"github.com/openshift/installer/pkg/asset/machines/openstack"
@@ -34,6 +35,7 @@ import (
 	awsdefaults "github.com/openshift/installer/pkg/types/aws/defaults"
 	azuretypes "github.com/openshift/installer/pkg/types/azure"
 	azuredefaults "github.com/openshift/installer/pkg/types/azure/defaults"
+	baremetaltypes "github.com/openshift/installer/pkg/types/baremetal"
 	libvirttypes "github.com/openshift/installer/pkg/types/libvirt"
 	nonetypes "github.com/openshift/installer/pkg/types/none"
 	openstacktypes "github.com/openshift/installer/pkg/types/openstack"
@@ -153,6 +155,16 @@ func (m *Master) Generate(dependencies asset.Parents) error {
 			return errors.Wrap(err, "failed to create master machine objects")
 		}
 		azure.ConfigMasters(machines, clusterID.InfraID)
+	case baremetaltypes.Name:
+		// FIXME: baremetal
+		mpool := defaultBareMetalMachinePoolPlatform()
+		mpool.Set(ic.Platform.BareMetal.DefaultMachinePlatform)
+		mpool.Set(pool.Platform.BareMetal)
+		pool.Platform.BareMetal = &mpool
+		machines, err = baremetal.Machines(clusterID.InfraID, ic, pool, "master", "master-user-data")
+		if err != nil {
+			return errors.Wrap(err, "failed to create master machine objects")
+		}
 	case nonetypes.Name, vspheretypes.Name:
 	default:
 		return fmt.Errorf("invalid Platform")

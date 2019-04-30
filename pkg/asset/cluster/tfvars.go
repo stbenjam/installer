@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	libvirtprovider "github.com/openshift/cluster-api-provider-libvirt/pkg/apis/libvirtproviderconfig/v1alpha1"
 	"github.com/openshift/installer/pkg/asset"
 	"github.com/openshift/installer/pkg/asset/ignition/bootstrap"
 	"github.com/openshift/installer/pkg/asset/ignition/machine"
@@ -13,14 +12,17 @@ import (
 	"github.com/openshift/installer/pkg/asset/rhcos"
 	"github.com/openshift/installer/pkg/tfvars"
 	awstfvars "github.com/openshift/installer/pkg/tfvars/aws"
+	baremetaltfvars "github.com/openshift/installer/pkg/tfvars/baremetal"
 	libvirttfvars "github.com/openshift/installer/pkg/tfvars/libvirt"
 	openstacktfvars "github.com/openshift/installer/pkg/tfvars/openstack"
 	"github.com/openshift/installer/pkg/types/aws"
 	"github.com/openshift/installer/pkg/types/azure"
+	"github.com/openshift/installer/pkg/types/baremetal"
 	"github.com/openshift/installer/pkg/types/libvirt"
 	"github.com/openshift/installer/pkg/types/none"
 	"github.com/openshift/installer/pkg/types/openstack"
 	"github.com/openshift/installer/pkg/types/vsphere"
+	libvirtprovider "github.com/openshift/cluster-api-provider-libvirt/pkg/apis/libvirtproviderconfig/v1alpha1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	awsprovider "sigs.k8s.io/cluster-api-provider-aws/pkg/apis/awsproviderconfig/v1beta1"
@@ -169,6 +171,24 @@ func (t *TerraformVariables) Generate(parents asset.Parents) error {
 			installConfig.Config.Platform.OpenStack.LbFloatingIP,
 			installConfig.Config.Platform.OpenStack.TrunkSupport,
 		)
+		if err != nil {
+			return errors.Wrapf(err, "failed to get %s Terraform variables", platform)
+		}
+		t.FileList = append(t.FileList, &asset.File{
+			Filename: fmt.Sprintf(TfPlatformVarsFileName, platform),
+			Data:     data,
+		})
+	case baremetal.Name:
+		// FIXME:: baremetal
+		data, err = baremetaltfvars.TFVars(
+			installConfig.Config.Platform.BareMetal.LibvirtURI,
+			installConfig.Config.Platform.BareMetal.IronicURI,
+			string(*rhcosImage),
+			"baremetal",
+			"provisioning",
+			installConfig.Config.Platform.BareMetal.Nodes,
+			installConfig.Config.Platform.BareMetal.MasterConfiguration,
+			)
 		if err != nil {
 			return errors.Wrapf(err, "failed to get %s Terraform variables", platform)
 		}

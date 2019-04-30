@@ -25,6 +25,7 @@ import (
 	"github.com/openshift/installer/pkg/asset/installconfig"
 	"github.com/openshift/installer/pkg/asset/machines/aws"
 	"github.com/openshift/installer/pkg/asset/machines/azure"
+	"github.com/openshift/installer/pkg/asset/machines/baremetal"
 	"github.com/openshift/installer/pkg/asset/machines/libvirt"
 	"github.com/openshift/installer/pkg/asset/machines/machineconfig"
 	"github.com/openshift/installer/pkg/asset/machines/openstack"
@@ -33,6 +34,7 @@ import (
 	awstypes "github.com/openshift/installer/pkg/types/aws"
 	awsdefaults "github.com/openshift/installer/pkg/types/aws/defaults"
 	azuretypes "github.com/openshift/installer/pkg/types/azure"
+	baremetaltypes "github.com/openshift/installer/pkg/types/baremetal"
 	libvirttypes "github.com/openshift/installer/pkg/types/libvirt"
 	nonetypes "github.com/openshift/installer/pkg/types/none"
 	openstacktypes "github.com/openshift/installer/pkg/types/openstack"
@@ -74,6 +76,10 @@ func defaultOpenStackMachinePoolPlatform(flavor string) openstacktypes.MachinePo
 	return openstacktypes.MachinePool{
 		FlavorName: flavor,
 	}
+}
+
+func defaultBareMetalMachinePoolPlatform() baremetaltypes.MachinePool {
+	return baremetaltypes.MachinePool{}
 }
 
 // Worker generates the machinesets for `worker` machine pool.
@@ -182,6 +188,19 @@ func (w *Worker) Generate(dependencies asset.Parents) error {
 			pool.Platform.Azure = &mpool
 			//TODO: add support for availibility zones
 			sets, err := azure.MachineSets(clusterID.InfraID, ic, &pool, string(*rhcosImage), "worker", "worker-user-data")
+			if err != nil {
+				return errors.Wrap(err, "failed to create worker machine objects")
+			}
+			for _, set := range sets {
+				machineSets = append(machineSets, set)
+			}
+		case baremetaltypes.Name:
+			// FIXME: baremetal
+			mpool := defaultBareMetalMachinePoolPlatform()
+			mpool.Set(ic.Platform.BareMetal.DefaultMachinePlatform)
+			mpool.Set(pool.Platform.BareMetal)
+			pool.Platform.BareMetal = &mpool
+			sets, err := baremetal.MachineSets(clusterID.InfraID, ic, &pool, "worker", "worker-user-data")
 			if err != nil {
 				return errors.Wrap(err, "failed to create worker machine objects")
 			}

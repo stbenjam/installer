@@ -3,6 +3,7 @@ package types
 import (
 	"github.com/openshift/installer/pkg/types/aws"
 	"github.com/openshift/installer/pkg/types/azure"
+	"github.com/openshift/installer/pkg/types/baremetal"
 	"github.com/openshift/installer/pkg/types/libvirt"
 	"github.com/openshift/installer/pkg/types/openstack"
 	"github.com/openshift/installer/pkg/types/vsphere"
@@ -55,6 +56,9 @@ type MachinePoolPlatform struct {
 
 	// Azure is the configuration used when installing on OpenStack.
 	Azure *azure.MachinePool `json:"azure,omitempty"`
+
+	// BareMetal is the configuration used when installing on bare metal.
+	BareMetal *baremetal.MachinePool `json:"openstack,omitempty"`
 }
 
 // Name returns a string representation of the platform (e.g. "aws" if
@@ -74,6 +78,8 @@ func (p *MachinePoolPlatform) Name() string {
 		return vsphere.Name
 	case p.Azure != nil:
 		return azure.Name
+	case p.BareMetal != nil:
+		return baremetal.Name
 	default:
 		return ""
 	}

@@ -57,7 +57,7 @@ func TestConvertInstallConfig(t *testing.T) {
 					DeprecatedServiceCIDR: ipnet.MustParseCIDR("1.2.3.4/32"),
 					DeprecatedClusterNetworks: []types.ClusterNetworkEntry{
 						{
-							CIDR: *ipnet.MustParseCIDR("1.2.3.5/32"),
+							CIDR:                       *ipnet.MustParseCIDR("1.2.3.5/32"),
 							DeprecatedHostSubnetLength: 8,
 						},
 					},

@@ -14,6 +14,7 @@ import (
 	"github.com/openshift/installer/pkg/rhcos"
 	"github.com/openshift/installer/pkg/types/aws"
 	"github.com/openshift/installer/pkg/types/azure"
+	"github.com/openshift/installer/pkg/types/baremetal"
 	"github.com/openshift/installer/pkg/types/libvirt"
 	"github.com/openshift/installer/pkg/types/none"
 	"github.com/openshift/installer/pkg/types/openstack"
@@ -65,6 +66,9 @@ func (i *Image) Generate(p asset.Parents) error {
 	case azure.Name:
 		//TODO(serbrech): change to right image once available.
 		osimage = "/resourceGroups/rhcos_images/providers/Microsoft.Compute/images/rhcostestimage"
+	case baremetal.Name:
+		// FIXME: baremetal
+		osimage, err = rhcos.QEMU(ctx)
 	case none.Name, vsphere.Name:
 	default:
 		return errors.New("invalid Platform")
