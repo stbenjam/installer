@@ -7,3 +7,5 @@ spec:
   upstream: https://api.openshift.com/api/upgrades_info/v1/graph
   channel: stable-4.2
   clusterID: {{.CVOClusterID}}
+
+# vim: set ft=yaml:

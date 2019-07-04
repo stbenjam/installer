@@ -6,3 +6,5 @@ metadata:
 data:
   ca-bundle.crt: |
     {{.EtcdMetricCaCert | indent 4}}
+
+# vim: set ft=yaml:

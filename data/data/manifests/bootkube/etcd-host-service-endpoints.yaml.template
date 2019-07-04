@@ -15,3 +15,5 @@ subsets:
   - name: etcd
     port: 2379
     protocol: TCP
+
+# vim: set ft=yaml:

@@ -9,3 +9,5 @@ export HTTPS_PROXY="{{.Proxy.HTTPSProxy}}"
 export NO_PROXY="{{.Proxy.NoProxy}}"
 {{end -}}
 {{end -}}
+
+# vim: set ft=sh:

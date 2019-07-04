@@ -6,3 +6,5 @@ metadata:
 upstream: http://localhost:8080/graph
 channel: fast
 clusterID: {{.CVOClusterID}}
+
+# vim: set ft=yaml:

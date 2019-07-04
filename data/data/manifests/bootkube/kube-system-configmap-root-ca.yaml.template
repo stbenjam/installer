@@ -6,3 +6,5 @@ metadata:
 data:
   ca.crt: |
     {{.RootCaCert | indent 4}}
+
+# vim: set ft=yaml:
