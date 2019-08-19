@@ -1,0 +1,12 @@
+[Unit]
+Description=Download the OpenShift Release Image
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/release-image-download.sh
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
