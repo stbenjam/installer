@@ -1,7 +1,7 @@
 [Unit]
 Description=Baremetal Deployment Ironic Services
-Wants=network-online.target crio.service
-After=network-online.target crio.service
+Wants=network-online.target crio.service release-image.service
+After=network-online.target crio.service release-image.service
 
 [Service]
 Type=exec

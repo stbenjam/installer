@@ -1,0 +1,11 @@
+[Unit]
+Description=Download the OpenShift Release Image
+Wants=network-online.target
+After=network-online.target
+ConditionPathExists=!/opt/openshift/.release-image.done
+
+[Service]
+ExecStart=/usr/local/bin/release-image-download.sh
+
+Restart=on-failure
+RestartSec=5s

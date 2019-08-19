@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -e
+
+/usr/bin/podman pull "{{.ReleaseImage}}"
+touch /opt/openshift/.release-image.done
