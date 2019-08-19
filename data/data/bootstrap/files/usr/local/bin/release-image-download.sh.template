@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+RELEASE_IMAGE={{.ReleaseImage}}
+
+echo "Pulling $RELEASE_IMAGE..."
+while ! podman pull --quiet "$RELEASE_IMAGE"
+do
+    echo "Pull failed. Retrying $RELEASE_IMAGE..."
+done
+
+touch /opt/openshift/.release-image.done
