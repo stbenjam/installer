@@ -3,6 +3,7 @@ resource "ironic_node_v1" "openshift-master-host" {
   name           = var.hosts[count.index]["name"]
   resource_class = "baremetal"
 
+  inspect   = true
   clean     = true
   available = true
 
@@ -25,6 +26,16 @@ resource "ironic_node_v1" "openshift-master-host" {
   raid_interface       = var.hosts[count.index]["raid_interface"]
   vendor_interface     = var.hosts[count.index]["vendor_interface"]
 }
+
+data "ironic_introspection" "openshift-master-introspection" {
+  count = var.master_count
+
+  uuid = element(
+    ironic_node_v1.openshift-master-host.*.id,
+    count.index,
+  )
+}
+
 
 resource "ironic_allocation_v1" "openshift-master-allocation" {
   name           = "master-${count.index}"
