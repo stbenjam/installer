@@ -30,6 +30,7 @@ import (
 	"github.com/openshift/installer/pkg/asset/rhcos"
 	"github.com/openshift/installer/pkg/asset/tls"
 	"github.com/openshift/installer/pkg/types"
+	baremetaltypes "github.com/openshift/installer/pkg/types/baremetal"
 )
 
 const (
@@ -50,6 +51,21 @@ type bootstrapTemplateData struct {
 	Registries            []sysregistriesv2.Registry
 	BootImage             string
 	ClusterDomain         string
+	PlatformData          platformTemplateData
+}
+
+// platformTemplateData is the data to use to replace values in bootstrap
+// template files that are specific to one platform.
+type platformTemplateData struct {
+	BareMetal *baremetalTemplateData
+}
+
+// baremetalTemplateData holds data specific to templates used for the baremetal platform.
+type baremetalTemplateData struct {
+	ProvisioningIP        string
+	ProvisioningIPv6      bool
+	ProvisioningCIDR      int
+	ProvisioningDHCPRange string
 }
 
 // Bootstrap is an asset that generates the ignition config for bootstrap nodes.
@@ -223,6 +239,8 @@ func (a *Bootstrap) getTemplateData(installConfig *types.InstallConfig, releaseI
 		registries = append(registries, registry)
 	}
 
+	platformData := getPlatformData(installConfig)
+
 	return &bootstrapTemplateData{
 		AdditionalTrustBundle: installConfig.AdditionalTrustBundle,
 		FIPS:                  installConfig.FIPS,
@@ -233,7 +251,26 @@ func (a *Bootstrap) getTemplateData(installConfig *types.InstallConfig, releaseI
 		Registries:            registries,
 		BootImage:             string(*rhcosImage),
 		ClusterDomain:         installConfig.ClusterDomain(),
+		PlatformData:          platformData,
 	}, nil
+}
+
+// getPlatformData returns platform-specific data for bootstrap templates.
+func getPlatformData(config *types.InstallConfig) (platformData platformTemplateData) {
+	switch config.Platform.Name() {
+	case baremetaltypes.Name:
+		platformData.BareMetal = &baremetalTemplateData{
+			ProvisioningIP:   config.Platform.BareMetal.BootstrapProvisioningIP,
+			ProvisioningCIDR: config.Platform.BareMetal.ProvisioningNetworkCIDR.CIDR(),
+			ProvisioningIPv6: config.Platform.BareMetal.ProvisioningNetworkCIDR.Version() == 6,
+		}
+
+		if !config.Platform.BareMetal.ProvisioningDHCPExternal {
+			platformData.BareMetal.ProvisioningDHCPRange = config.Platform.BareMetal.ProvisioningDHCPRange
+		}
+	}
+
+	return
 }
 
 func (a *Bootstrap) addStorageFiles(base string, uri string, templateData *bootstrapTemplateData) (err error) {
