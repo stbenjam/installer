@@ -144,22 +144,37 @@ provider aws {
 }
 
 locals {
-  master_public_ipv4_networks = "${flatten(packet_device.masters.*.network)}"
-  master_public_ipv4          = "${data.template_file.master_ips.*.rendered}"
+  master_public_networks = "${flatten(packet_device.masters.*.network)}"
+  master_public_ipv4     = "${data.template_file.master_ips.*.rendered}"
+  master_public_ipv6     = "${data.template_file.master_ips_v6.*.rendered}"
 
-  worker_public_ipv4_networks = "${flatten(packet_device.workers.*.network)}"
-  worker_public_ipv4          = "${data.template_file.worker_ips.*.rendered}"
-  ctrp_records                = "${compact(concat(list(var.bootstrap_dns ? module.bootstrap.device_ip : ""), local.master_public_ipv4))}"
+  worker_public_networks = "${flatten(packet_device.workers.*.network)}"
+  worker_public_ipv4     = "${data.template_file.worker_ips.*.rendered}"
+  worker_public_ipv6     = "${data.template_file.worker_ips_v6.*.rendered}"
+  ctrp_records           = "${compact(concat(list(var.bootstrap_dns ? module.bootstrap.device_ip : ""), local.master_public_ipv4))}"
+  # TODO - Figure out why this doesn't work ...
+  #  	* local.ctrp_records_v6: local.ctrp_records_v6: Couldn't find output "device_ip_v6" for module var: module.bootstrap.device_ip_v6
+  #ctrp_records_v6        = "${compact(concat(list(var.bootstrap_dns ? module.bootstrap.device_ip_v6 : ""), local.master_public_ipv6))}"
 }
 
 data "template_file" "master_ips" {
   count    = "${var.master_count}"
-  template = "${lookup(local.master_public_ipv4_networks[count.index*3], "address")}"
+  template = "${lookup(local.master_public_networks[count.index*3], "address")}"
+}
+
+data "template_file" "master_ips_v6" {
+  count    = "${var.master_count}"
+  template = "${lookup(local.master_public_networks[(count.index*3)+1], "address")}"
 }
 
 data "template_file" "worker_ips" {
   count    = "${var.worker_count}"
-  template = "${lookup(local.worker_public_ipv4_networks[count.index*3], "address")}"
+  template = "${lookup(local.worker_public_networks[count.index*3], "address")}"
+}
+
+data "template_file" "worker_ips_v6" {
+  count    = "${var.worker_count}"
+  template = "${lookup(local.worker_public_networks[(count.index*3)+1], "address")}"
 }
 
 data "aws_route53_zone" "public" {
@@ -174,6 +189,15 @@ resource "aws_route53_record" "ctrlp" {
 
   records = ["${local.ctrp_records}"]
 }
+
+#resource "aws_route53_record" "ctrlp_v6" {
+#  zone_id = "${data.aws_route53_zone.public.zone_id}"
+#  type    = "AAAA"
+#  ttl     = "60"
+#  name    = "api.${var.cluster_domain}"
+#
+#  records = ["${local.ctrp_records_v6}"]
+#}
 
 resource "aws_route53_record" "ctrlp_int" {
   zone_id = "${data.aws_route53_zone.public.zone_id}"
@@ -193,31 +217,40 @@ resource "aws_route53_record" "apps" {
   records = ["${local.worker_public_ipv4}"]
 }
 
-resource "aws_route53_record" "etcd_a_nodes" {
+resource "aws_route53_record" "apps_v6" {
+  zone_id = "${data.aws_route53_zone.public.zone_id}"
+  type    = "AAAA"
+  ttl     = "60"
+  name    = "*.apps.${var.cluster_domain}"
+
+  records = ["${local.worker_public_ipv6}"]
+}
+
+resource "aws_route53_record" "etcd_aaaa_nodes" {
   count   = "${var.master_count}"
   zone_id = "${data.aws_route53_zone.public.zone_id}"
-  type    = "A"
+  type    = "AAAA"
   ttl     = "60"
   name    = "etcd-${count.index}.${var.cluster_domain}"
-  records = ["${local.master_public_ipv4[count.index]}"]
+  records = ["${local.master_public_ipv6[count.index]}"]
 }
 
-resource "aws_route53_record" "master_a_nodes" {
+resource "aws_route53_record" "master_aaaa_nodes" {
   count   = "${var.master_count}"
   zone_id = "${data.aws_route53_zone.public.zone_id}"
-  type    = "A"
+  type    = "AAAA"
   ttl     = "60"
   name    = "master-${count.index}.${var.cluster_domain}"
-  records = ["${local.master_public_ipv4[count.index]}"]
+  records = ["${local.master_public_ipv6[count.index]}"]
 }
 
-resource "aws_route53_record" "worker_a_nodes" {
+resource "aws_route53_record" "worker_aaaa_nodes" {
   count   = "${var.worker_count}"
   zone_id = "${data.aws_route53_zone.public.zone_id}"
-  type    = "A"
+  type    = "AAAA"
   ttl     = "60"
   name    = "worker-${count.index}.${var.cluster_domain}"
-  records = ["${local.worker_public_ipv4[count.index]}"]
+  records = ["${local.worker_public_ipv6[count.index]}"]
 }
 
 resource "aws_route53_record" "etcd_cluster" {
@@ -225,5 +258,5 @@ resource "aws_route53_record" "etcd_cluster" {
   type    = "SRV"
   ttl     = "60"
   name    = "_etcd-server-ssl._tcp.${var.cluster_domain}"
-  records = ["${formatlist("0 10 2380 %s", aws_route53_record.etcd_a_nodes.*.fqdn)}"]
+  records = ["${formatlist("0 10 2380 %s", aws_route53_record.etcd_aaaa_nodes.*.fqdn)}"]
 }
