@@ -6,6 +6,10 @@ output "device_ip_v6" {
   value = "${packet_device.bootstrap.network.1.address}"
 }
 
+output "device_gw_v6" {
+  value = "${packet_device.bootstrap.network.1.gateway}"
+}
+
 output "device_hostname" {
   value = "${packet_device.bootstrap.hostname}"
 }

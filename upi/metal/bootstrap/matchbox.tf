@@ -11,7 +11,9 @@ resource "matchbox_profile" "bootstrap" {
     "coreos.inst.ignition_url=${var.matchbox_http_endpoint}/ignition?cluster_id=${var.cluster_id}&role=bootstrap",
   ]
 
-  raw_ignition = "${var.igntion_config_content}"
+  raw_ignition = "${replace(var.igntion_config_content,"\"networkd\":{}",format("\"networkd\":{\"units\":[{\"name\":\"00-eth0.network\",\"contents\":\"[Match]\\nName=eth0\\n\\n[Network]\\nDHCP=ipv4\\nAddress=%s\\nGateway=%s\"}]}",packet_device.bootstrap.network.1.address,packet_device.bootstrap.network.1.gateway))}"
+
+  depends_on = ["packet_device.bootstrap"]
 }
 
 resource "matchbox_group" "bootstrap" {

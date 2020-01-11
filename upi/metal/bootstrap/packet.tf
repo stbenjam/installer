@@ -6,6 +6,4 @@ resource "packet_device" "bootstrap" {
   ipxe_script_url  = "${var.matchbox_http_endpoint}/ipxe?cluster_id=${var.cluster_id}&role=bootstrap"
   billing_cycle    = "hourly"
   project_id       = "${var.packet_project_id}"
-
-  depends_on = ["matchbox_group.bootstrap"]
 }
