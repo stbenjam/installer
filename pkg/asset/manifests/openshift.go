@@ -18,6 +18,7 @@ import (
 	"github.com/openshift/installer/pkg/asset/machines"
 	openstackmanifests "github.com/openshift/installer/pkg/asset/manifests/openstack"
 	"github.com/openshift/installer/pkg/asset/openshiftinstall"
+	"github.com/openshift/installer/pkg/asset/rhcos"
 
 	osmachine "github.com/openshift/installer/pkg/asset/machines/openstack"
 	"github.com/openshift/installer/pkg/asset/password"
@@ -25,6 +26,7 @@ import (
 	"github.com/openshift/installer/pkg/types"
 	awstypes "github.com/openshift/installer/pkg/types/aws"
 	azuretypes "github.com/openshift/installer/pkg/types/azure"
+	"github.com/openshift/installer/pkg/types/baremetal"
 	baremetaltypes "github.com/openshift/installer/pkg/types/baremetal"
 	gcptypes "github.com/openshift/installer/pkg/types/gcp"
 	openstacktypes "github.com/openshift/installer/pkg/types/openstack"
@@ -43,6 +45,12 @@ var (
 // Openshift generates the dependent resource manifests for openShift (as against bootkube)
 type Openshift struct {
 	FileList []*asset.File
+}
+
+// Used for templating the baremetal CR.
+type baremetalTemplateData struct {
+	Baremetal                 *baremetal.Platform
+	ProvisioningOSDownloadURL string
 }
 
 // Name returns a human friendly name for the operator
@@ -201,7 +209,11 @@ func (o *Openshift) Generate(dependencies asset.Parents) error {
 		assetData["99_cloud-creds-secret.yaml"] = applyTemplateData(cloudCredsSecret.Files()[0].Data, templateData)
 		assetData["99_role-cloud-creds-secret-reader.yaml"] = applyTemplateData(roleCloudCredsSecretReader.Files()[0].Data, templateData)
 	case baremetaltypes.Name:
-		assetData["99_baremetal-provisioning-config.yaml"] = applyTemplateData(baremetalConfig.Files()[0].Data, *installConfig.Config.Platform.BareMetal)
+		bmTemplateData := baremetalTemplateData{
+			Baremetal:                 installConfig.Config.Platform.BareMetal,
+			ProvisioningOSDownloadURL: string(*new(rhcos.Image)),
+		}
+		assetData["99_baremetal-provisioning-config.yaml"] = applyTemplateData(baremetalConfig.Files()[0].Data, bmTemplateData)
 	}
 
 	if platform == azuretypes.Name && installConfig.Config.Publish == types.InternalPublishingStrategy {
