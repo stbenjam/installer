@@ -133,6 +133,6 @@ required = [
   source = "https://github.com/openshift/cluster-api-provider-baremetal/pkg/apis"
 
 [[constraint]]
-  branch = "master"
+  branch = "4.3-ipv6"
   name = "github.com/metal3-io/baremetal-operator"
-  source = "https://github.com/openshift/baremetal-operator"
+  source = "https://github.com/openshift-kni/baremetal-operator"

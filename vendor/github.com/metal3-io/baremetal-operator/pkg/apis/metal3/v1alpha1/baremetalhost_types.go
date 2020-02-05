@@ -102,6 +102,9 @@ type BMCDetails struct {
 	// The name of the secret containing the BMC credentials (requires
 	// keys "username" and "password").
 	CredentialsName string `json:"credentialsName"`
+
+	// A boolean to skip certificate validation when true
+	DisableCertificateVerification bool `json:"disableCertificateVerification,omitempty"`
 }
 
 // BareMetalHostSpec defines the desired state of BareMetalHost
@@ -327,6 +330,8 @@ func (cs CredentialsStatus) Match(secret corev1.Secret) bool {
 		return false
 	case cs.Reference.Name != secret.ObjectMeta.Name:
 		return false
+	case cs.Reference.Namespace != secret.ObjectMeta.Namespace:
+		return false
 	case cs.Version != secret.ObjectMeta.ResourceVersion:
 		return false
 	}
@@ -355,10 +360,10 @@ type BareMetalHostStatus struct {
 	Provisioning ProvisionStatus `json:"provisioning"`
 
 	// the last credentials we were able to validate as working
-	GoodCredentials CredentialsStatus `json:"goodCredentials"`
+	GoodCredentials CredentialsStatus `json:"goodCredentials,omitempty"`
 
 	// the last credentials we sent to the provisioning backend
-	TriedCredentials CredentialsStatus `json:"triedCredentials"`
+	TriedCredentials CredentialsStatus `json:"triedCredentials,omitempty"`
 
 	// the last error message reported by the provisioning subsystem
 	ErrorMessage string `json:"errorMessage"`
@@ -390,6 +395,7 @@ type ProvisionStatus struct {
 // +kubebuilder:printcolumn:name="Provisioning Status",type="string",JSONPath=".status.provisioning.state",description="Provisioning status"
 // +kubebuilder:printcolumn:name="Consumer",type="string",JSONPath=".spec.consumerRef.name",description="Consumer using this host"
 // +kubebuilder:printcolumn:name="BMC",type="string",JSONPath=".spec.bmc.address",description="Address of management controller"
+// +kubebuilder:printcolumn:name="DisableCertificateVerification",type="bool",JSONPath=".spec.bmc.disableCertificateVerification",description="Skip certificate validation when true"
 // +kubebuilder:printcolumn:name="Hardware Profile",type="string",JSONPath=".status.hardwareProfile",description="The type of hardware detected"
 // +kubebuilder:printcolumn:name="Online",type="string",JSONPath=".spec.online",description="Whether the host is online or not"
 // +kubebuilder:printcolumn:name="Error",type="string",JSONPath=".status.errorMessage",description="Most recent error"
