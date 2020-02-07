@@ -13,7 +13,13 @@ RHCOS_BOOT_IMAGE_URL="{{.BootImage}}"
 
 # This DHCP range is used by dnsmasq to serve DHCP to the cluster. If empty
 # dnsmasq will only serve TFTP, and DHCP will be disabled.
-DHCP_RANGE="{{.PlatformData.BareMetal.ProvisioningDHCPRange}}"
+DHCP_LEASES="{{.PlatformData.BareMetal.ProvisioningStaticLeases}}"
+
+# This allowlist contains the boot mac addresses for control plane hosts only. This prevents
+# the bootstrap from responding to any other hosts on the network. There can be a short time
+# where both the dnsmasq in the cluster and bootstrap exist, while we're waiting for the
+# bootstrap-complete event.
+DHCP_ALLOWLIST="{{.PlatformData.BareMetal.ProvisioningDHCPAllowList}}"
 
 # First we stop any previously started containers, because ExecStop only runs when the ExecStart process
 # e.g this script is still running, but we exit if *any* of the containers exits unexpectedly
@@ -60,6 +66,8 @@ podman run -d --net host --privileged --name mariadb \
 podman run -d --net host --privileged --name dnsmasq \
      --env PROVISIONING_INTERFACE=$PROVISIONING_NIC \
      --env DHCP_RANGE=$DHCP_RANGE \
+     --env DHCP_LEASES=$DHCP_LEASES \
+     --env DHCP_IGNORE_UNKNOWN=True \
      -v $IRONIC_SHARED_VOLUME:/shared:z --entrypoint /bin/rundnsmasq ${IRONIC_IMAGE}
 
 podman run -d --net host --privileged --name httpd \
