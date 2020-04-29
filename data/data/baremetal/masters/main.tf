@@ -34,6 +34,13 @@ resource "ironic_allocation_v1" "openshift-master-allocation" {
   candidate_nodes = ironic_node_v1.openshift-master-host.*.id
 }
 
+data "openshift_inline_ignition_v2_2" "ignition-data" {
+  ignition   = var.ignition
+  depends_on = [
+    ironic_node_v1.openshift-master-host.*
+  ]
+}
+
 resource "ironic_deployment" "openshift-master-deployment" {
   count = var.master_count
   node_uuid = element(
@@ -41,8 +48,7 @@ resource "ironic_deployment" "openshift-master-deployment" {
     count.index,
   )
 
-  instance_info         = var.instance_infos[count.index]
-  user_data_url         = var.ignition_url
-  user_data_url_ca_cert = var.ignition_url_ca_cert
+  instance_info = var.instance_infos[count.index]
+  user_data     = openshift_inline_ignition_v2_2.ignition-data.inlined
 }
 

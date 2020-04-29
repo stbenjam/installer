@@ -34,7 +34,7 @@ type config struct {
 }
 
 // TFVars generates bare metal specific Terraform variables.
-func TFVars(libvirtURI, bootstrapProvisioningIP, bootstrapOSImage, externalBridge, provisioningBridge string, platformHosts []*baremetal.Host, image string, ignitionURL string, ignitionURLCACert string) ([]byte, error) {
+func TFVars(libvirtURI, bootstrapProvisioningIP, bootstrapOSImage, externalBridge, provisioningBridge string, platformHosts []*baremetal.Host, image string) ([]byte, error) {
 	bootstrapOSImage, err := cache.DownloadImageFile(bootstrapOSImage)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to use cached bootstrap libvirt image")
@@ -134,8 +134,6 @@ func TFVars(libvirtURI, bootstrapProvisioningIP, bootstrapOSImage, externalBridg
 		DriverInfos:             driverInfos,
 		RootDevices:             rootDevices,
 		InstanceInfos:           instanceInfos,
-		IgnitionURL:             ignitionURL,
-		IgnitionURLCACert:       ignitionURLCACert,
 	}
 
 	return json.MarshalIndent(cfg, "", "  ")

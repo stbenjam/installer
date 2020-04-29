@@ -2,12 +2,9 @@ package cluster
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net"
-	"net/url"
 	"os"
 	"strings"
 
@@ -108,8 +105,7 @@ func (t *TerraformVariables) Generate(parents asset.Parents) error {
 	workersAsset := &machines.Worker{}
 	rhcosImage := new(rhcos.Image)
 	rhcosBootstrapImage := new(rhcos.BootstrapImage)
-	rootCA := &tls.RootCA{}
-	parents.Get(clusterID, installConfig, bootstrapIgnAsset, masterIgnAsset, mastersAsset, workersAsset, rhcosImage, rhcosBootstrapImage, rootCA)
+	parents.Get(clusterID, installConfig, bootstrapIgnAsset, masterIgnAsset, mastersAsset, workersAsset, rhcosImage, rhcosBootstrapImage)
 
 	platform := installConfig.Config.Platform.Name()
 	switch platform {
@@ -405,11 +401,6 @@ func (t *TerraformVariables) Generate(parents asset.Parents) error {
 			Data:     data,
 		})
 	case baremetal.Name:
-		ignitionURL := &url.URL{
-			Scheme: "https",
-			Host:   net.JoinHostPort(installConfig.Config.Platform.BareMetal.APIVIP, "22623"),
-			Path:   "config/master",
-		}
 		data, err = baremetaltfvars.TFVars(
 			installConfig.Config.Platform.BareMetal.LibvirtURI,
 			installConfig.Config.Platform.BareMetal.BootstrapProvisioningIP,
@@ -417,10 +408,7 @@ func (t *TerraformVariables) Generate(parents asset.Parents) error {
 			installConfig.Config.Platform.BareMetal.ExternalBridge,
 			installConfig.Config.Platform.BareMetal.ProvisioningBridge,
 			installConfig.Config.Platform.BareMetal.Hosts,
-			string(*rhcosImage),
-			ignitionURL.String(),
-			base64.StdEncoding.EncodeToString(rootCA.Cert()),
-		)
+			string(*rhcosImage))
 		if err != nil {
 			return errors.Wrapf(err, "failed to get %s Terraform variables", platform)
 		}
