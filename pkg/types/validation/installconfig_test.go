@@ -95,6 +95,7 @@ func validBareMetalPlatform() *baremetal.Platform {
 		ProvisioningNetworkCIDR:      ipnet.MustParseCIDR("192.168.111.0/24"),
 		BootstrapProvisioningIP:      "192.168.111.1",
 		ClusterProvisioningIP:        "192.168.111.2",
+		ProvisioningNetwork:          baremetal.ManagedProvisioningNetwork,
 		Hosts: []*baremetal.Host{
 			{
 				Name:           "host1",

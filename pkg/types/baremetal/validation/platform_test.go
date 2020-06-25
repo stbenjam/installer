@@ -128,6 +128,19 @@ func TestValidatePlatform(t *testing.T) {
 				Hosts(host1().BootMode("legacy")).build(),
 			expected: "",
 		},
+		{
+			name:     "provisioningNetwork_disabled_valid",
+			platform: platform().ProvisioningNetwork("Disabled").build(),
+		},
+		{
+			name:     "provisioningNetwork_unmanaged_valid",
+			platform: platform().ProvisioningNetwork("Unmanaged").build(),
+		},
+		{
+			name:     "provisioningNetwork_invalid",
+			platform: platform().ProvisioningNetwork("Invalid").build(),
+			expected: `Unsupported value: "Invalid": supported values: "Disabled", "Managed", "Unmanaged"`,
+		},
 	}
 
 	for _, tc := range cases {
@@ -283,13 +296,13 @@ func TestValidateProvisioning(t *testing.T) {
 			name: "invalid_bootstrapprovip_machineCIDR",
 			platform: platform().
 				BootstrapProvisioningIP("192.168.111.5").build(),
-			expected: "Invalid value: \"192.168.111.5\": the IP must not be in one of the machine networks",
+			expected: "Invalid value: \"192.168.111.5\": \"192.168.111.5\" is not in the provisioning network",
 		},
 		{
 			name: "invalid_clusterprovip_machineCIDR",
 			platform: platform().
 				ClusterProvisioningIP("192.168.111.5").build(),
-			expected: "Invalid value: \"192.168.111.5\": the IP must not be in one of the machine networks",
+			expected: "Invalid value: \"192.168.111.5\": \"192.168.111.5\" is not in the provisioning network",
 		},
 		{
 			name: "invalid_clusterprovip_wrongCIDR",
@@ -450,6 +463,7 @@ func platform() *platformBuilder {
 			Hosts:                        []*baremetal.Host{},
 			LibvirtURI:                   "qemu://system",
 			ProvisioningNetworkCIDR:      ipnet.MustParseCIDR("172.22.0.0/24"),
+			ProvisioningNetwork:          baremetal.ManagedProvisioningNetwork,
 			ClusterProvisioningIP:        "172.22.0.3",
 			BootstrapProvisioningIP:      "172.22.0.2",
 			ExternalBridge:               "br0",
@@ -464,6 +478,11 @@ func (pb *platformBuilder) build() *baremetal.Platform {
 
 func (pb *platformBuilder) ProvisioningNetworkCIDR(value string) *platformBuilder {
 	pb.Platform.ProvisioningNetworkCIDR = ipnet.MustParseCIDR(value)
+	return pb
+}
+
+func (pb *platformBuilder) ProvisioningNetwork(value baremetal.ProvisioningNetwork) *platformBuilder {
+	pb.Platform.ProvisioningNetwork = value
 	return pb
 }
 
