@@ -16,8 +16,6 @@ resource "libvirt_ignition" "bootstrap" {
 }
 
 resource "libvirt_domain" "bootstrap" {
-  count = var.provisioning_bridge == "" ? 0 : 1
-
   name = "${var.cluster_id}-bootstrap"
 
   memory = "6144"
@@ -42,7 +40,7 @@ resource "libvirt_domain" "bootstrap" {
   dynamic "network_interface" {
     for_each = var.bridges
     content {
-      bridge = network_interface
+      bridge = network_interface.value
     }
   }
 }

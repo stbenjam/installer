@@ -20,7 +20,7 @@ func Platform() (*baremetal.Platform, error) {
 
 	survey.AskOne(&survey.Select{
 		Message: "Provisioning Network",
-		Help:    "Select whether the provisioning network will be managed, unmanaged, or disabled. In managed mode, the cluster operators DHCP and TFTP services for PXE provisioning.",
+		Help:    "Select whether the provisioning network will be managed, unmanaged, or disabled. In managed mode, the cluster deploys DHCP and TFTP services for PXE provisioning.",
 		Options: []string{"Managed", "Unmanaged", "Disabled"},
 		Default: "Managed",
 	}, &provisioningNetwork, nil)
