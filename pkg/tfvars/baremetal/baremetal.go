@@ -136,6 +136,9 @@ func TFVars(libvirtURI, apiVIP, imageCacheIP, bootstrapOSImage, externalBridge, 
 		instanceInfo := map[string]interface{}{
 			"image_source":   cacheImageURL,
 			"image_checksum": cacheChecksumURL,
+			"capabilities": map[string]string{
+				"secure_boot": "false",
+			},
 		}
 
 		if host.BootMode == baremetal.UEFISecureBoot {
